@@ -1,26 +1,73 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useState } from "react";
+import "./base.css";
+import TodoList from "./components/TodoList/TodoList";
 
-function App() {
+const App = () => {
+  const [todo, setTodo] = useState([]);
+  const [action, setAction] = useState("all");
+  const [onEditId, setEditId] = useState("");
+
+  const onAddTodo = (todoItem) => {
+    setTodo([...todo, todoItem]);
+  };
+  const onToggleCheck = (todoId) => {
+    const filteredItemChecked = todo.filter((item) => {
+      if (item.id === todoId) {
+        item.checked = !item.checked;
+      }
+      return item;
+    });
+    const sliceItemChecked = todo.slice([todo, filteredItemChecked]);
+    setTodo(sliceItemChecked);
+  };
+  const onFilterTodo = (action) => {
+    setAction(action);
+  };
+  const onEditingTodo = (value, id) => {
+    for (let key in todo) {
+      if (todo[key].id === id) {
+        todo[key].label = value;
+        setTodo(todo.slice([todo, todo[key]]));
+      }
+    }
+  };
+  const onDeleteCompletedTodo = () => {
+    setTodo(
+      todo.filter((item) => {
+        return !item.checked;
+      })
+    );
+  };
+  const onMarkAsCompleted = () => {
+    setTodo(
+      todo.map((item) => {
+        item.checked = !item.checked;
+        return item;
+      })
+    );
+  };
+  const onDeleteTodoItem = (id) => {
+    setTodo(todo.filter((item) => item.id !== id));
+  };
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <>
+      <TodoList
+        todoList={todo}
+        action={action}
+        onAddTodo={onAddTodo}
+        onEditTodo={onEditingTodo}
+        editId={onEditId}
+        setEditId={setEditId}
+        onFilterTodo={onFilterTodo}
+        onToggleCheck={onToggleCheck}
+        onDeleteTodoItem={onDeleteTodoItem}
+        onDeleteCompletedTodo={onDeleteCompletedTodo}
+        onMarkAsCompleted={onMarkAsCompleted}
+        todoCompleted={todo.filter((item) => item.checked === true).length}
+        todoActive={todo.filter((item) => item.checked === false).length}
+      />
+    </>
   );
-}
+};
 
 export default App;
